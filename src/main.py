@@ -69,10 +69,14 @@ class Board(object):
         for x in range(self.game.dimensions_x):
             for y in range(self.game.dimensions_y):
                 self.free_cells.append([x, y])
-        pprint.pprint(self.free_cells)
+        print('Create new board for needed figures: {}'.format(self.possible_figures))
+        # pprint.pprint(self.free_cells)
 
     def render(self):
-        print(self.figures)
+        print(' | '.join([
+            '{}: ({};{})'.format(figure.__class__.__name__, figure.x, figure.y)
+            for figure in self.figures
+        ]))
 
     def decrease_free_space(self, pos_x, pos_y):
         try:
@@ -106,12 +110,12 @@ class FigureOnBoard(object):
         self._take_position()
 
     def _take_position(self):
-        if self._can_take_position():
+        if not self._can_take_position():
             raise CanNotTakePositionException
 
-        self.board.decrease_free_space([self.x, self.y])
+        self.board.decrease_free_space(self.x, self.y)
         for x, y in self.attack_lines():
-            self.board.decrease_free_space([x, y])
+            self.board.decrease_free_space(x, y)
 
     def _can_take_position(self):
         # TODO: realize logic for test current position
@@ -139,10 +143,7 @@ class Rock(FigureOnBoard):
         return [[self.x, self.y + 1]]
 
 
-def game_logic():
+if __name__ == '__main__':
     game = Game(4, 4)
     game.run()
-
-
-
 
