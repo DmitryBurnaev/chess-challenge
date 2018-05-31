@@ -13,7 +13,7 @@ class Game(object):
         self.dimensions_x = dim_x
         self.dimensions_y = dim_y
         # TODO: get figures from point of <Game obj> creation
-        self.possible_figures = [King, Rock]
+        self.possible_figures = [King, King]
 
     def _create_combination(self, board):
         next_figure = board.next_figure()
@@ -24,20 +24,21 @@ class Game(object):
         for cell in board.free_cells:
             new_board = self._new_board(board)
             try:
-                board.place_figure(next_figure, cell[0], cell[1])
+                new_board.place_figure(next_figure, cell[0], cell[1])
             except CanNotTakePositionException:
-                continue
-            self._create_combination(new_board)
+                pass
+            else:
+                self._create_combination(new_board)
 
     def generate_combinations(self):
-        for i in range(self.dimensions_x * self.dimensions_y):
-            board = self._new_board()
-            self._create_combination(board)
+        board = self._new_board()
+        self._create_combination(board)
         self._clear_uncompleted_boards()
 
     def _clear_uncompleted_boards(self):
-        for board in filter(lambda x: not x.is_ready, self.boards):
-            self.boards.remove(board)
+        for board in filter(lambda x: not x.is_ready, reversed(self.boards)):
+            index = self.boards.index(board)
+            self.boards.pop(index)
 
     def _new_board(self, base_board=None):
         if not base_board:
@@ -48,9 +49,12 @@ class Game(object):
         return board
 
     def render_results(self):
+        print('<U>'.center(32, '-'))
+        if not self.boards:
+            print('Sorry. Can not find combinations')
         for i, board in enumerate(self.boards):
-            print(' > Board #{}'.format(i))
             board.render()
+        print('-'.center(32, '-'))
 
     def run(self):
         self.generate_combinations()
@@ -70,19 +74,24 @@ class Board(object):
             for y in range(self.game.dimensions_y):
                 self.free_cells.append([x, y])
         print('Create new board for needed figures: {}'.format(self.possible_figures))
-        # pprint.pprint(self.free_cells)
+
+    def __repr__(self):
+        return '<Board> {}'.format(self._str_repr())
+
+    def __str__(self):
+        return '<Board> {}'.format(self._str_repr())
+
+    def _str_repr(self):
+        return ' | '.join([str(figure) for figure in self.figures])
 
     def render(self):
-        print(' | '.join([
-            '{}: ({};{})'.format(figure.__class__.__name__, figure.x, figure.y)
-            for figure in self.figures
-        ]))
+        print(self._str_repr())
 
     def decrease_free_space(self, pos_x, pos_y):
         try:
             self.free_cells.remove([pos_x, pos_y])
         except ValueError:
-            pass
+            print('Can not decrease space [{}] for {}'.format([pos_x, pos_y], self.free_cells))
 
     def next_free_cell(self, current_cell):
         try:
@@ -118,32 +127,37 @@ class FigureOnBoard(object):
             self.board.decrease_free_space(x, y)
 
     def _can_take_position(self):
-        # TODO: realize logic for test current position
-        return True
+        figure_positions = {(f.x, f.y) for f in self.board.figures}
+        attack_cells = set(self.attack_lines())
+        print(figure_positions, attack_cells)
+        return not bool(figure_positions.intersection(attack_cells))
 
     def attack_lines(self):
         raise NotImplementedError
+
+    def __str__(self):
+        return '{f.__class__.__name__} ({f.x};{f.y})'.format(f=self)
 
 
 class King(FigureOnBoard):
 
     def attack_lines(self):
-        return [[self.x - 1, self.y - 1],
-                [self.x, self.y - 1],
-                [self.x + 1, self.y - 1],
-                [self.x + 1, self.y],
-                [self.x + 1, self.y + 1],
-                [self.x, self.y + 1],
-                [self.x - 1, self.y + 1],
-                [self.x - 1, self.y]]
+        return [(self.x - 1, self.y - 1),
+                (self.x, self.y - 1),
+                (self.x + 1, self.y - 1),
+                (self.x + 1, self.y),
+                (self.x + 1, self.y + 1),
+                (self.x, self.y + 1),
+                (self.x - 1, self.y + 1),
+                (self.x - 1, self.y)]
 
 
 class Rock(FigureOnBoard):
     def attack_lines(self):
-        return [[self.x, self.y + 1]]
+        return [(self.x, self.y + 1)]
 
 
 if __name__ == '__main__':
-    game = Game(4, 4)
+    game = Game(3, 2)
     game.run()
 
