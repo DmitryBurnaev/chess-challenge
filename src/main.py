@@ -1,5 +1,6 @@
 import pprint
 import copy
+import gc
 
 
 class CanNotTakePositionException(Exception):
@@ -10,25 +11,33 @@ class Game(object):
 
     def __init__(self, dim_x, dim_y, figures_counts=None):
         self.boards = []
+        self.uniq_boards_dict = {}
         self.dimension_x = dim_x
         self.dimension_y = dim_y
         # TODO: get figures from point of <Game obj> creation
-        self.possible_figures = [King, Rock]
+        self.possible_figures = [King, Rock, Rock]
 
     def _create_combination(self, board):
         next_figure = board.next_figure()
-        if next_figure is None:
-            board.is_ready = True
-            return
 
         for cell in board.free_cells:
             new_board = self._new_board(board)
             try:
                 new_board.place_figure(next_figure, cell[0], cell[1])
             except CanNotTakePositionException:
-                pass
-            else:
+                del new_board
+                # TODO: возможно нужно выяснить конфликты до того как создадим "лишнюю" доску
+                continue
+
+            if new_board.possible_figures:
                 self._create_combination(new_board)
+            else:
+                new_board.is_ready = True
+                board_hash = hash(new_board)
+                if board_hash not in self.uniq_boards_dict:
+                    self.uniq_boards_dict[board_hash] = new_board.serialize()
+        del board
+        gc.collect()
 
     def generate_combinations(self):
         board = self._new_board()
@@ -46,15 +55,17 @@ class Game(object):
             board = Board(self)
         else:
             board = copy.deepcopy(base_board)
-        self.boards.append(board)
+        # self.boards.append(board)
         return board
 
     def render_results(self):
         print('<U>'.center(32, '-'))
-        if not self.boards:
+        print(len(self.uniq_boards_dict.values()))
+        # for board_figures in self.uniq_boards_dict.values():
+        #     print(' | '.join(['<{type}> ({pos_x};{pos_y})'.format(**fig_dict) for fig_dict in board_figures]))
+            # pprint.pprint(simple_board_dict)
+        if not self.uniq_boards_dict:
             print('Sorry. Can not find combinations')
-        for i, board in enumerate(self.boards):
-            board.render()
         print('-'.center(32, '-'))
 
     def run(self):
@@ -126,6 +137,9 @@ class Board(object):
         figure = figure_type(board=self, pos_x=pos_x, pos_y=pos_y)
         self.figures.append(figure)
 
+    def serialize(self):
+        return [figure.serialize() for figure in self.figures]
+
 
 class FigureOnBoard(object):
 
@@ -150,6 +164,13 @@ class FigureOnBoard(object):
 
     def attack_lines(self):
         raise NotImplementedError
+
+    def serialize(self):
+        return {
+            'type': self.__class__.__name__,
+            'pos_x': self.x,
+            'pos_y': self.y,
+        }
 
     def __str__(self):
         return '{f.__class__.__name__} ({f.x};{f.y})'.format(f=self)
@@ -181,7 +202,7 @@ class Rock(FigureOnBoard):
 
 
 if __name__ == '__main__':
-    game = Game(3, 2)
+    game = Game(3, 3)
     # game.test_attack_lines()
     game.run()
 
