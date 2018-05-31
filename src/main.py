@@ -10,10 +10,10 @@ class Game(object):
 
     def __init__(self, dim_x, dim_y, figures_counts=None):
         self.boards = []
-        self.dimensions_x = dim_x
-        self.dimensions_y = dim_y
+        self.dimension_x = dim_x
+        self.dimension_y = dim_y
         # TODO: get figures from point of <Game obj> creation
-        self.possible_figures = [King, King]
+        self.possible_figures = [King, Rock]
 
     def _create_combination(self, board):
         next_figure = board.next_figure()
@@ -39,6 +39,7 @@ class Game(object):
         for board in filter(lambda x: not x.is_ready, reversed(self.boards)):
             index = self.boards.index(board)
             self.boards.pop(index)
+        self.boards = list(set(self.boards))
 
     def _new_board(self, base_board=None):
         if not base_board:
@@ -60,6 +61,15 @@ class Game(object):
         self.generate_combinations()
         self.render_results()
 
+    def test_attack_lines(self):
+        board = Board(self)
+        k = King(board, 1, 2)
+        r = Rock(board, 1, 2)
+        print('Rock attack')
+        print(r.attack_lines())
+        print('King attack')
+        print(k.attack_lines())
+
 
 class Board(object):
     is_ready = False
@@ -70,8 +80,8 @@ class Board(object):
         self.free_cells = []
         self.possible_figures = game.possible_figures
 
-        for x in range(self.game.dimensions_x):
-            for y in range(self.game.dimensions_y):
+        for x in range(self.game.dimension_x):
+            for y in range(self.game.dimension_y):
                 self.free_cells.append([x, y])
         print('Create new board for needed figures: {}'.format(self.possible_figures))
 
@@ -81,8 +91,14 @@ class Board(object):
     def __str__(self):
         return '<Board> {}'.format(self._str_repr())
 
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+    def __hash__(self):
+        return hash(self._str_repr())
+
     def _str_repr(self):
-        return ' | '.join([str(figure) for figure in self.figures])
+        return ' | '.join(sorted([str(figure) for figure in self.figures]))
 
     def render(self):
         print(self._str_repr())
@@ -154,10 +170,18 @@ class King(FigureOnBoard):
 
 class Rock(FigureOnBoard):
     def attack_lines(self):
-        return [(self.x, self.y + 1)]
+        attack_cells = []
+        for x in range(0, self.board.game.dimension_x):
+            if (x, self.y) != (self.x, self.y):
+                attack_cells.append((x, self.y))
+        for y in range(0, self.board.game.dimension_y):
+            if (self.x, y) != (self.x, self.y):
+                attack_cells.append((self.x, y))
+        return attack_cells
 
 
 if __name__ == '__main__':
     game = Game(3, 2)
+    # game.test_attack_lines()
     game.run()
 
