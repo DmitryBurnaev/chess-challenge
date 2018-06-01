@@ -1,0 +1,4 @@
+
+class CanNotTakePositionException(Exception):
+    pass
+
