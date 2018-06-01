@@ -2,6 +2,7 @@ import argparse
 
 from src.game_logic import Game
 
+
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('dimension_x', metavar='Dimension X', type=int,
@@ -44,7 +45,6 @@ if __name__ == '__main__':
     game.run()
 
 
-# TODO: all figures
 # TODO: docstrings
 # TODO: README for run logic
 # TODO: tests

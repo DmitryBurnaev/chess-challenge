@@ -2,15 +2,16 @@ import copy
 import gc
 
 from src.exceptions import CanNotTakePositionException
-from src.figures import King, Rock
+from src.figures import King, Rook, Queen, Bishop, Knight
+
 
 # Sorted by the number of attacked cells
 ALIASES_FIGURES_MAP = (
-    # ('queens', Rock),   # all lines under attack
-    # ('bishops': Rock),  # diagonal lines under attack
-    ('rooks', Rock),      # horizontal and vertical lines under attack
-    ('kings', King),      # cells under attack only near the current position
-    # ('knights': Rock   # special attacks
+    ('queens', Queen),  # all lines under attack
+    ('bishops', Bishop),  # diagonal lines under attack
+    ('rooks', Rook),  # horizontal and vertical lines under attack
+    ('kings', King),  # cells under attack only near the current position
+    ('knights', Knight)   # special attacks
 )
 
 
@@ -89,7 +90,6 @@ class Board(object):
         for x in range(self.game.dimension_x):
             for y in range(self.game.dimension_y):
                 self.free_cells.append([x, y])
-        # print('Create new board for needed figures: {}'.format(self.possible_figures))
 
     def __hash__(self):
         str_repr = ' | '.join(sorted([str(figure) for figure in self.figures]))
@@ -100,13 +100,11 @@ class Board(object):
             self.free_cells.remove([pos_x, pos_y])
         except ValueError:
             pass
-            # print('Can not decrease space [{}] for {}'.format([pos_x, pos_y], self.free_cells))
 
     def next_figure(self):
-        try:
-            return self.possible_figures.pop(0)
-        except IndexError:
+        if not self.possible_figures:
             return None
+        return self.possible_figures.pop(0)
 
     def place_figure(self, figure_type, pos_x, pos_y):
         figure = figure_type(board=self, pos_x=pos_x, pos_y=pos_y)

@@ -23,6 +23,13 @@ class FigureOnBoard(object):
         return not bool(figure_positions.intersection(attack_cells))
 
     def cells_to_attack(self):
+        attack_cells = self._get_cells_to_attack()
+        # remove self position
+        while (self.pos_x, self.pos_y) in attack_cells:
+            attack_cells.remove((self.pos_x, self.pos_y))
+        return filter(lambda x: x[0] >= 0 and x[1] >= 0, attack_cells)
+
+    def _get_cells_to_attack(self):
         raise NotImplementedError
 
     def serialize(self):
@@ -45,7 +52,7 @@ class StoredFigure(dict):
 
 class King(FigureOnBoard):
 
-    def cells_to_attack(self):
+    def _get_cells_to_attack(self):
         return [(self.pos_x - 1, self.pos_y - 1),
                 (self.pos_x, self.pos_y - 1),
                 (self.pos_x + 1, self.pos_y - 1),
@@ -56,13 +63,97 @@ class King(FigureOnBoard):
                 (self.pos_x - 1, self.pos_y)]
 
 
-class Rock(FigureOnBoard):
-    def cells_to_attack(self):
+class Rook(FigureOnBoard):
+    def _get_cells_to_attack(self):
         attack_cells = []
+        # horizontal attack
         for x in range(0, self.board.game.dimension_x):
-            if (x, self.pos_y) != (self.pos_x, self.pos_y):
-                attack_cells.append((x, self.pos_y))
+            attack_cells.append((x, self.pos_y))
+        # vertical attack
         for y in range(0, self.board.game.dimension_y):
-            if (self.pos_x, y) != (self.pos_x, self.pos_y):
-                attack_cells.append((self.pos_x, y))
+            attack_cells.append((self.pos_x, y))
+
+        return attack_cells
+
+
+class Queen(FigureOnBoard):
+    def _get_cells_to_attack(self):
+        attack_cells = []
+        board = self.board
+        # horizontal attack
+        for x in range(0, board.game.dimension_x):
+            attack_cells.append((x, self.pos_y))
+        # vertical attack
+        for y in range(0, board.game.dimension_y):
+            attack_cells.append((self.pos_x, y))
+        # right and up
+        x, y = self.pos_x, self.pos_y
+        while x < board.game.dimension_x and y < board.game.dimension_y:
+            attack_cells.append((x, y))
+            x += 1
+            y += 1
+        # left and up
+        x, y = self.pos_x, self.pos_y
+        while x >= 0 and y < board.game.dimension_y:
+            attack_cells.append((x, y))
+            x -= 1
+            y += 1
+        # left and down
+        x, y = self.pos_x, self.pos_y
+        while x >= 0 and y >= 0:
+            attack_cells.append((x, y))
+            x -= 1
+            y -= 1
+        # right and down
+        x, y = self.pos_x, self.pos_y
+        while x < board.game.dimension_x and y >= 0:
+            attack_cells.append((x, y))
+            x += 1
+            y -= 1
+
+        return attack_cells
+
+
+class Bishop(FigureOnBoard):
+    def _get_cells_to_attack(self):
+        attack_cells = []
+        board = self.board
+        # right and up
+        x, y = self.pos_x, self.pos_y
+        while x < board.game.dimension_x and y < board.game.dimension_y:
+            attack_cells.append((x, y))
+            x += 1
+            y += 1
+        # left and up
+        x, y = self.pos_x, self.pos_y
+        while x >= 0 and y < board.game.dimension_y:
+            attack_cells.append((x, y))
+            x -= 1
+            y += 1
+        # left and down
+        x, y = self.pos_x, self.pos_y
+        while x >= 0 and y >= 0:
+            attack_cells.append((x, y))
+            x -= 1
+            y -= 1
+        # right and down
+        x, y = self.pos_x, self.pos_y
+        while x < board.game.dimension_x and y >= 0:
+            attack_cells.append((x, y))
+            x += 1
+            y -= 1
+
+        return attack_cells
+
+
+class Knight(FigureOnBoard):
+    def _get_cells_to_attack(self):
+        attack_cells = [(self.pos_x - 1, self.pos_y - 2),
+                        (self.pos_x + 1, self.pos_y - 2),
+                        (self.pos_x - 2, self.pos_y - 1),
+                        (self.pos_x - 2, self.pos_y + 1),
+                        (self.pos_x - 1, self.pos_y + 2),
+                        (self.pos_x + 1, self.pos_y + 2),
+                        (self.pos_x + 2, self.pos_y + 1),
+                        (self.pos_x + 2, self.pos_y - 1)]
         return attack_cells
