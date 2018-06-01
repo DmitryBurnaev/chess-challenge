@@ -26,14 +26,21 @@ class FigureOnBoard(object):
         raise NotImplementedError
 
     def serialize(self):
-        return {
+        return StoredFigure({
             'type': self.__class__.__name__,
             'pos_x': self.pos_x,
             'pos_y': self.pos_y,
-        }
+        })
 
     def __str__(self):
         return '{f.__class__.__name__} ({f.pos_x};{f.pos_y})'.format(f=self)
+
+
+class StoredFigure(dict):
+    def __str__(self):
+        display_x = self['pos_x'] + 1
+        display_y = self['pos_y'] + 1
+        return '{} ({};{})'.format(self['type'], display_x, display_y)
 
 
 class King(FigureOnBoard):
