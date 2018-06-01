@@ -46,6 +46,4 @@ if __name__ == '__main__':
 
 
 # TODO: docstrings
-# TODO: README for run logic
 # TODO: tests
-# TODO: maybe - some progress bar

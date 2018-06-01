@@ -28,7 +28,7 @@ class FigureOnBoard(object):
         # remove self position
         while (self.pos_x, self.pos_y) in attack_cells:
             attack_cells.remove((self.pos_x, self.pos_y))
-        return filter(lambda x: x[0] >= 0 and x[1] >= 0, attack_cells)
+        return list(filter(lambda x: x[0] >= 0 and x[1] >= 0, attack_cells))
 
     def _get_cells_to_attack(self):
         raise NotImplementedError

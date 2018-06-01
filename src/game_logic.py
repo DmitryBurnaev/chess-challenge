@@ -1,7 +1,8 @@
 import copy
 import gc
 
-from src.exceptions import CanNotTakePositionException
+from src.exceptions import CanNotTakePositionException, \
+    CanNotCreateGameInstance
 from src.figures import King, Rook, Queen, Bishop, Knight
 
 
@@ -23,12 +24,21 @@ class Game(object):
         self.dimension_y = dim_y
         self.possible_figures = []
         self.figures_numbers = figures_numbers
+        self._validate_params()
 
         for alias, figure_type in ALIASES_FIGURES_MAP:
             figures_count = figures_numbers.get(alias, 0)
             self.possible_figures.extend([figure_type] * figures_count)
 
-        self.render_initial_data()
+    def _validate_params(self):
+        dimensions = self.dimension_x * self.dimension_y
+        if dimensions <= 0:
+            raise CanNotCreateGameInstance('Dimensions must be greater then 0')
+        assert isinstance(self.figures_numbers, dict)
+
+        if dimensions <= sum(self.figures_numbers.values()):
+            raise CanNotCreateGameInstance('Dimensions must be greater then '
+                                           'total number of figures')
 
     def _create_combinations(self, board):
         next_figure = board.next_figure()
@@ -52,7 +62,8 @@ class Game(object):
 
     def generate_combinations(self):
         board = Board(self)
-        self._create_combinations(board)
+        if board.possible_figures:
+            self._create_combinations(board)
 
     def render_boards(self):
         print('Result'.center(40, '-'))
@@ -91,6 +102,7 @@ class Game(object):
             print(res)
 
     def run(self):
+        self.render_initial_data()
         self.generate_combinations()
         self.render_boards()
 
