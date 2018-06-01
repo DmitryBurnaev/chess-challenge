@@ -2,6 +2,7 @@ from src.exceptions import CanNotTakePositionException
 
 
 class FigureOnBoard(object):
+    display_char = ''
 
     def __init__(self, board=None, pos_x=None, pos_y=None):
         self.board = board
@@ -37,6 +38,7 @@ class FigureOnBoard(object):
             'type': self.__class__.__name__,
             'pos_x': self.pos_x,
             'pos_y': self.pos_y,
+            'display_char': self.display_char
         })
 
     def __str__(self):
@@ -47,10 +49,12 @@ class StoredFigure(dict):
     def __str__(self):
         display_x = self['pos_x'] + 1
         display_y = self['pos_y'] + 1
-        return '{} ({};{})'.format(self['type'], display_x, display_y)
+        return '[{}] {} ({};{})'.format(self['display_char'], self['type'],
+                                        display_x, display_y)
 
 
 class King(FigureOnBoard):
+    display_char = 'K'
 
     def _get_cells_to_attack(self):
         return [(self.pos_x - 1, self.pos_y - 1),
@@ -64,6 +68,8 @@ class King(FigureOnBoard):
 
 
 class Rook(FigureOnBoard):
+    display_char = 'R'
+
     def _get_cells_to_attack(self):
         attack_cells = []
         # horizontal attack
@@ -77,6 +83,8 @@ class Rook(FigureOnBoard):
 
 
 class Queen(FigureOnBoard):
+    display_char = 'Q'
+
     def _get_cells_to_attack(self):
         attack_cells = []
         board = self.board
@@ -115,6 +123,8 @@ class Queen(FigureOnBoard):
 
 
 class Bishop(FigureOnBoard):
+    display_char = 'B'
+
     def _get_cells_to_attack(self):
         attack_cells = []
         board = self.board
@@ -147,6 +157,8 @@ class Bishop(FigureOnBoard):
 
 
 class Knight(FigureOnBoard):
+    display_char = 'N'
+
     def _get_cells_to_attack(self):
         attack_cells = [(self.pos_x - 1, self.pos_y - 2),
                         (self.pos_x + 1, self.pos_y - 2),

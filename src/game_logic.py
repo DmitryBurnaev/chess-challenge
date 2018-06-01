@@ -60,6 +60,8 @@ class Game(object):
             print('Found {} combinations:'.format(len(self.serialized_boards)))
             for combinations in self.serialized_boards.values():
                 print(' | '.join(map(str, combinations)))
+                self.render_graphic_board(combinations)
+                print('-'.center(20, '-'))
         else:
             print('Sorry, no matches were found for your query.')
         print('-'.center(40, '-'))
@@ -72,6 +74,21 @@ class Game(object):
         for alias, numbers in self.figures_numbers.items():
             if numbers > 0:
                 print('{:^10}:{:^5}'.format(alias.capitalize(), numbers))
+
+    def render_graphic_board(self, combinations):
+        cells = {(cell['pos_x'], cell['pos_y']): cell for cell in combinations}
+        res = '    '
+        for x in range(self.dimension_x):
+            res += '{} '.format(x+1)
+        print(res)
+        for y in range(self.dimension_y):
+            res = '{} | '.format(y+1)
+            for x in range(self.dimension_x):
+                if (x, y) in cells:
+                    res += cells[(x, y)]['display_char'] + ' '
+                else:
+                    res += '- '
+            print(res)
 
     def run(self):
         self.generate_combinations()
