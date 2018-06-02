@@ -3,7 +3,7 @@ import sys
 import unittest
 from contextlib import contextmanager
 
-from src.exceptions import CanNotCreateGameInstance
+from src.exceptions import GameArgumentsValidationError
 from src.figures import Queen, King, Rook
 from src.game_logic import Board, Game
 
@@ -28,11 +28,11 @@ class GameInitialTestCase(unittest.TestCase):
         self.assertEqual(game.possible_figures.count(Queen), q_count)
 
     def test_fail_for_fake_combinations(self):
-        with self.assertRaises(CanNotCreateGameInstance):
+        with self.assertRaises(GameArgumentsValidationError):
             Game(2, 1, {'kings': 3, 'rooks': 2})
 
     def test_fail_for_null_size_boards(self):
-        with self.assertRaises(CanNotCreateGameInstance):
+        with self.assertRaises(GameArgumentsValidationError):
             Game(0, 0, {})
 
 
@@ -167,12 +167,11 @@ class FillBoardTestCase(unittest.TestCase):
 
         game = Game(3, 2, {'kings': 1, 'rooks': 1})
         game.generate_combinations()
-        result_boards = game.serialized_boards.values()
-        self.assertEqual(len(result_boards), 4)
-        self.assertIn(combination_1, result_boards)
-        self.assertIn(combination_2, result_boards)
-        self.assertIn(combination_3, result_boards)
-        self.assertIn(combination_4, result_boards)
+        self.assertEqual(len(game.serialized_boards), 4)
+        self.assertIn(combination_1, game.serialized_boards)
+        self.assertIn(combination_2, game.serialized_boards)
+        self.assertIn(combination_3, game.serialized_boards)
+        self.assertIn(combination_4, game.serialized_boards)
 
     def test_all_figures_combinations(self):
         # ---------Initial configuration----------
@@ -251,12 +250,11 @@ class FillBoardTestCase(unittest.TestCase):
         game = Game(4, 4, {'kings': 1, 'rooks': 1, 'knights': 1, 'queens': 1,
                            'bishops': 1})
         game.generate_combinations()
-        result_boards = game.serialized_boards.values()
-        self.assertEqual(len(result_boards), 16)
-        self.assertIn(combination_1, result_boards)
-        self.assertIn(combination_2, result_boards)
-        self.assertIn(combination_3, result_boards)
-        self.assertIn(combination_4, result_boards)
+        self.assertEqual(len(game.serialized_boards), 16)
+        self.assertIn(combination_1, game.serialized_boards)
+        self.assertIn(combination_2, game.serialized_boards)
+        self.assertIn(combination_3, game.serialized_boards)
+        self.assertIn(combination_4, game.serialized_boards)
 
 
 @contextmanager

@@ -1,7 +1,9 @@
 
 class CanNotTakePositionException(Exception):
+    """ Exception for detecting trying to place figure to invalid cell """
     pass
 
 
-class CanNotCreateGameInstance(Exception):
+class GameArgumentsValidationError(Exception):
+    """ Exception for detecting creation game with invalid arguments """
     pass

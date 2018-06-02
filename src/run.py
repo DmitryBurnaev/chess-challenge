@@ -44,5 +44,3 @@ if __name__ == '__main__':
     game = Game(args.dimension_x, args.dimension_y, figures_set)
     game.run()
 
-
-# TODO: docstrings
