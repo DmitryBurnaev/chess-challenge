@@ -1,8 +1,11 @@
+import io
+import sys
+import unittest
+from contextlib import contextmanager
+
 from src.exceptions import CanNotCreateGameInstance
 from src.figures import Queen, King, Rook
 from src.game_logic import Board, Game
-
-import unittest
 
 
 class GameInitialTestCase(unittest.TestCase):
@@ -256,27 +259,35 @@ class FillBoardTestCase(unittest.TestCase):
         self.assertIn(combination_4, result_boards)
 
 
-# @contextmanager
-# def capture(command, *args, **kwargs):
-#     out, sys.stdout = sys.stdout, StringIO()
-#     try:
-#         command(*args, **kwargs)
-#         sys.stdout.seek(0)
-#         yield sys.stdout.read()
-#     finally:
-#         sys.stdout = out
-#
-#
-# class RunModeTestCase(unittest.TestCase):
-#     def test_render_initial_data(self):
-#         game = Game(4, 3, {'kings': 3, 'rooks': 2})
-#         with capture(game.render_initial_data) as output:
-#             msg = 'Boards dimensions: {} x {}'.format(
-#                 game.dimension_x, game.dimension_y
-#             )
-#             self.assertIn(msg, output)
-#             self.assertIn('Kings:3', output.replace(' ', ''))
-#             self.assertIn('Rooks:2', output.replace(' ', ''))
+@contextmanager
+def capture(command, *args, **kwargs):
+    out, sys.stdout = sys.stdout, io.StringIO()
+    try:
+        command(*args, **kwargs)
+        sys.stdout.seek(0)
+        yield sys.stdout.read()
+    finally:
+        sys.stdout = out
+
+
+class RunModeTestCase(unittest.TestCase):
+    def test_render_initial_data(self):
+        game = Game(4, 3, {'kings': 3, 'rooks': 2})
+        with capture(game.render_initial_data) as output:
+            msg = 'Boards dimensions: {} x {}'.format(
+                game.dimension_x, game.dimension_y
+            )
+            self.assertIn(msg, output)
+            self.assertIn('Kings:3', output.replace(' ', ''))
+            self.assertIn('Rooks:2', output.replace(' ', ''))
+
+    def test_run_game_and_render_results(self):
+        game = Game(3, 2, {'kings': 1, 'rooks': 1})
+        with capture(game.run) as output:
+            number_of_results = len(game.serialized_boards)
+            msg = 'Found {} combinations:'.format(number_of_results)
+            self.assertIn(msg, output)
+            self.assertEqual(output.count('[K] King'), number_of_results)
 
 
 if __name__ == '__main__':
