@@ -2,9 +2,9 @@
 It uses for run-mode (basic usages) and test-mode (check of the game logic)
 
 """
-
 import copy
 import gc
+import concurrent.futures
 
 from src.exceptions import GameArgumentsValidationError
 from src.figures import King, Rook, Queen, Bishop, Knight
@@ -76,15 +76,31 @@ class Game(object):
                 )
         del board
         gc.collect()
+        return self._result_boards_dict
 
     def generate_combinations(self):
         """ Run logic for generate all combinations. All combinations store to
             self.serialized_boards
         """
-        board = Board(self)
-        if board.possible_figures:
-            self._create_combinations(board)
-            self.serialized_boards = self._result_boards_dict.values()
+        if not self.possible_figures:
+            return
+        # get next figure
+        next_figure = self.possible_figures.pop(0)
+        start_board = Board(self)
+        start_boards = []
+        for pos_x, pos_y in start_board.free_cells:
+            board = copy.deepcopy(start_board)
+            board.place_figure(next_figure, pos_x, pos_y)
+            start_boards.append(board)
+
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            for res_dict in executor.map(self._create_combinations,
+                                         start_boards):
+                self._result_boards_dict.update(res_dict)
+
+        del start_board
+        gc.collect()
+        self.serialized_boards = self._result_boards_dict.values()
 
     def render_boards(self):
         """ Display result of work this application.
