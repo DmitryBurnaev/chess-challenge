@@ -57,15 +57,15 @@ class Game(object):
 
         next_figure_class = board.next_figure()
 
-        for coord_x, coord_y in board.free_cells:
+        for pos_x, pos_y in board.free_cells:
             # step over free cells for trying to place figure on this board
-            new_figure = next_figure_class(board, coord_x, coord_y)
+            new_figure = next_figure_class(board, pos_x, pos_y)
             if not new_figure.can_take_position():
                 del new_figure
                 continue
 
             new_board = copy.deepcopy(board)
-            new_board.place_figure(next_figure_class, coord_x, coord_y)
+            new_board.place_figure(next_figure_class, pos_x, pos_y)
 
             if new_board.possible_figures:
                 self._create_combinations(new_board)
