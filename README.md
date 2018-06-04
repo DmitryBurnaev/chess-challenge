@@ -17,6 +17,8 @@ _How to run_
 cd <path_to_projec>
 python3 -m src.run 3 3 --kings 1 --rooks 2
 
+It will run generation a combination for 1 king and 2 rook on the board with dimension 3 x 3
+
 ```
 
 _Getting help_
