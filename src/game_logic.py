@@ -5,6 +5,7 @@ It uses for run-mode (basic usages) and test-mode (check of the game logic)
 import copy
 import gc
 import concurrent.futures
+import os
 
 from src.exceptions import GameArgumentsValidationError
 from src.figures import King, Rook, Queen, Bishop, Knight
@@ -87,16 +88,21 @@ class Game(object):
         # get next figure
         next_figure = self.possible_figures.pop(0)
         start_board = Board(self)
-        start_boards = []
+        st_boards = []
         for pos_x, pos_y in start_board.free_cells:
             board = copy.deepcopy(start_board)
             board.place_figure(next_figure, pos_x, pos_y)
-            start_boards.append(board)
+            st_boards.append(board)
 
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            for res_dict in executor.map(self._create_combinations,
-                                         start_boards):
-                self._result_boards_dict.update(res_dict)
+        if os.getenv('TEST_MODE'):
+            # running generation in single process (for correct coverage)
+            for _board in st_boards:
+                self._create_combinations(_board)
+        else:
+            # using process pull for running the program in main case
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                for res in executor.map(self._create_combinations, st_boards):
+                    self._result_boards_dict.update(res)
 
         del start_board
         gc.collect()

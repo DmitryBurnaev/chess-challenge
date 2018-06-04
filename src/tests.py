@@ -1,4 +1,5 @@
 import io
+import os
 import sys
 import unittest
 from contextlib import contextmanager
@@ -122,6 +123,10 @@ class FigureAttackTestCase(unittest.TestCase):
 
 class FillBoardTestCase(unittest.TestCase):
     """ Check base game logic (for main usages) """
+
+    @classmethod
+    def setUpClass(cls):
+        os.environ['TEST_MODE'] = '1'
 
     def test_simple_board(self):
         # ---------Initial configuration----------
