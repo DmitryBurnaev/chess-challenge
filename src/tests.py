@@ -9,6 +9,7 @@ from src.game_logic import Board, Game
 
 
 class GameInitialTestCase(unittest.TestCase):
+    """ Testing logic for initial the game instance """
 
     def test_board_size(self):
         board = Board(Game(3, 4, {}))
@@ -37,6 +38,7 @@ class GameInitialTestCase(unittest.TestCase):
 
 
 class FigureAttackTestCase(unittest.TestCase):
+    """ Check logic for detecting attack cells for various figures """
 
     @classmethod
     def setUpClass(cls):
@@ -119,6 +121,7 @@ class FigureAttackTestCase(unittest.TestCase):
 
 
 class FillBoardTestCase(unittest.TestCase):
+    """ Check base game logic (for main usages) """
 
     def test_simple_board(self):
         # ---------Initial configuration----------
@@ -259,6 +262,8 @@ class FillBoardTestCase(unittest.TestCase):
 
 @contextmanager
 def capture(command, *args, **kwargs):
+    """ Context manager for override sys output from rendering methods """
+
     out, sys.stdout = sys.stdout, io.StringIO()
     try:
         command(*args, **kwargs)
@@ -269,6 +274,8 @@ def capture(command, *args, **kwargs):
 
 
 class RunModeTestCase(unittest.TestCase):
+    """ Detect and recheck sys output after rendering uses messages """
+
     def test_render_initial_data(self):
         game = Game(4, 3, {'kings': 3, 'rooks': 2})
         with capture(game.render_initial_data) as output:

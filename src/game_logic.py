@@ -1,3 +1,8 @@
+""" Module for implementation the game logic.
+It uses for run-mode (basic usages) and test-mode (check of the game logic)
+
+"""
+
 import copy
 import gc
 
@@ -29,6 +34,7 @@ class Game(object):
         self._validate_params()
 
         for alias, figure_type in ALIASES_FIGURES_MAP:
+            # initial list of possible figure's types.Such as: [KING, QUEEN,..]
             figures_count = figures_numbers.get(alias, 0)
             self.possible_figures.extend([figure_type] * figures_count)
 
@@ -110,14 +116,14 @@ class Game(object):
 
         cells = {(cell['pos_x'], cell['pos_y']): cell for cell in combinations}
         res = '    '
-        for x in range(self.dimension_x):
-            res += '{} '.format(x+1)
+        for coord_x in range(self.dimension_x):
+            res += '{} '.format(coord_x+1)
         print(res)
-        for y in range(self.dimension_y):
-            res = '{} | '.format(y+1)
-            for x in range(self.dimension_x):
-                if (x, y) in cells:
-                    res += cells[(x, y)]['display_char'] + ' '
+        for coord_y in range(self.dimension_y):
+            res = '{} | '.format(coord_y+1)
+            for coord_x in range(self.dimension_x):
+                if (coord_x, coord_y) in cells:
+                    res += cells[(coord_x, coord_y)]['display_char'] + ' '
                 else:
                     res += '- '
             print(res)
@@ -142,9 +148,9 @@ class Board(object):
         self.free_cells = []
         self.possible_figures = game.possible_figures
 
-        for x in range(self.game.dimension_x):
-            for y in range(self.game.dimension_y):
-                self.free_cells.append([x, y])
+        for coord_x in range(self.game.dimension_x):
+            for coord_y in range(self.game.dimension_y):
+                self.free_cells.append([coord_x, coord_y])
 
     def __hash__(self):
         """ Used to provide uniq for board's combination"""

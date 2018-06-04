@@ -1,3 +1,23 @@
+"""
+This module helps to run game logic gor specific attributes:
+position arguments:
+    Dimension X
+    Dimension Y
+keyword arguments:
+    --kings: Number of Kings
+    --queens: Number of Queens
+    --rooks: Number of Rooks
+    --bishops: Number of Bishops
+    --knights: Number of Knights
+
+Example:
+    python3 src.run 3 4 --kings 3 --bishops 2
+
+You can get additional information by using:
+
+$ python3 -m src.run --help
+
+"""
 import argparse
 
 from src.game_logic import Game
@@ -43,4 +63,3 @@ if __name__ == '__main__':
     }
     game = Game(args.dimension_x, args.dimension_y, figures_set)
     game.run()
-

@@ -1,3 +1,9 @@
+"""
+This module provides figures logic and data descriptions
+You can extend game logic by adding a new figure's type
+(Inherit from FigureOnBoard)
+"""
+
 from src.exceptions import CanNotTakePositionException
 
 
@@ -22,8 +28,8 @@ class FigureOnBoard(object):
             raise CanNotTakePositionException
 
         self.board.decrease_free_space(self.pos_x, self.pos_y)
-        for x, y in self.cells_to_attack():
-            self.board.decrease_free_space(x, y)
+        for coord_x, coord_y in self.cells_to_attack():
+            self.board.decrease_free_space(coord_x, coord_y)
 
     def _can_take_position(self):
         figure_positions = {(f.pos_x, f.pos_y) for f in self.board.figures}
@@ -120,11 +126,11 @@ class Rook(FigureOnBoard):
     def _get_cells_to_attack(self):
         attack_cells = []
         # horizontal attack
-        for x in range(0, self.board.game.dimension_x):
-            attack_cells.append((x, self.pos_y))
+        for coord_x in range(0, self.board.game.dimension_x):
+            attack_cells.append((coord_x, self.pos_y))
         # vertical attack
-        for y in range(0, self.board.game.dimension_y):
-            attack_cells.append((self.pos_x, y))
+        for coord_y in range(0, self.board.game.dimension_y):
+            attack_cells.append((self.pos_x, coord_y))
 
         return attack_cells
 
@@ -143,39 +149,39 @@ class Queen(FigureOnBoard):
         attack_cells = []
         board = self.board
         # horizontal attack
-        for x in range(0, board.game.dimension_x):
-            attack_cells.append((x, self.pos_y))
+        for coord_x in range(0, board.game.dimension_x):
+            attack_cells.append((coord_x, self.pos_y))
         # vertical attack
-        for y in range(0, board.game.dimension_y):
-            attack_cells.append((self.pos_x, y))
+        for coord_y in range(0, board.game.dimension_y):
+            attack_cells.append((self.pos_x, coord_y))
 
         # right and up
-        x, y = self.pos_x, self.pos_y
-        while x < board.game.dimension_x and y < board.game.dimension_y:
-            attack_cells.append((x, y))
-            x += 1
-            y += 1
+        coord_x, coord_y = self.pos_x, self.pos_y
+        while coord_x < board.game.dimension_x and coord_y < board.game.dimension_y:
+            attack_cells.append((coord_x, coord_y))
+            coord_x += 1
+            coord_y += 1
 
         # left and up
-        x, y = self.pos_x, self.pos_y
-        while x >= 0 and y < board.game.dimension_y:
-            attack_cells.append((x, y))
-            x -= 1
-            y += 1
+        coord_x, coord_y = self.pos_x, self.pos_y
+        while coord_x >= 0 and coord_y < board.game.dimension_y:
+            attack_cells.append((coord_x, coord_y))
+            coord_x -= 1
+            coord_y += 1
 
         # left and down
-        x, y = self.pos_x, self.pos_y
-        while x >= 0 and y >= 0:
-            attack_cells.append((x, y))
-            x -= 1
-            y -= 1
+        coord_x, coord_y = self.pos_x, self.pos_y
+        while coord_x >= 0 and coord_y >= 0:
+            attack_cells.append((coord_x, coord_y))
+            coord_x -= 1
+            coord_y -= 1
 
         # right and down
-        x, y = self.pos_x, self.pos_y
-        while x < board.game.dimension_x and y >= 0:
-            attack_cells.append((x, y))
-            x += 1
-            y -= 1
+        coord_x, coord_y = self.pos_x, self.pos_y
+        while coord_x < board.game.dimension_x and coord_y >= 0:
+            attack_cells.append((coord_x, coord_y))
+            coord_x += 1
+            coord_y -= 1
 
         return attack_cells
 
@@ -196,32 +202,32 @@ class Bishop(FigureOnBoard):
         board = self.board
 
         # right and up
-        x, y = self.pos_x, self.pos_y
-        while x < board.game.dimension_x and y < board.game.dimension_y:
-            attack_cells.append((x, y))
-            x += 1
-            y += 1
+        coord_x, coord_y = self.pos_x, self.pos_y
+        while coord_x < board.game.dimension_x and coord_y < board.game.dimension_y:
+            attack_cells.append((coord_x, coord_y))
+            coord_x += 1
+            coord_y += 1
 
         # left and up
-        x, y = self.pos_x, self.pos_y
-        while x >= 0 and y < board.game.dimension_y:
-            attack_cells.append((x, y))
-            x -= 1
-            y += 1
+        coord_x, coord_y = self.pos_x, self.pos_y
+        while coord_x >= 0 and coord_y < board.game.dimension_y:
+            attack_cells.append((coord_x, coord_y))
+            coord_x -= 1
+            coord_y += 1
 
         # left and down
-        x, y = self.pos_x, self.pos_y
-        while x >= 0 and y >= 0:
-            attack_cells.append((x, y))
-            x -= 1
-            y -= 1
+        coord_x, coord_y = self.pos_x, self.pos_y
+        while coord_x >= 0 and coord_y >= 0:
+            attack_cells.append((coord_x, coord_y))
+            coord_x -= 1
+            coord_y -= 1
 
         # right and down
-        x, y = self.pos_x, self.pos_y
-        while x < board.game.dimension_x and y >= 0:
-            attack_cells.append((x, y))
-            x += 1
-            y -= 1
+        coord_x, coord_y = self.pos_x, self.pos_y
+        while coord_x < board.game.dimension_x and coord_y >= 0:
+            attack_cells.append((coord_x, coord_y))
+            coord_x += 1
+            coord_y -= 1
 
         return attack_cells
 

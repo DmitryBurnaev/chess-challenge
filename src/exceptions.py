@@ -1,3 +1,6 @@
+""" Providing exceptions for correct work of the game logic
+"""
+
 
 class CanNotTakePositionException(Exception):
     """ Exception for detecting trying to place figure to invalid cell """
