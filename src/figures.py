@@ -4,8 +4,6 @@ You can extend game logic by adding a new figure's type
 (Inherit from FigureOnBoard)
 """
 
-from src.exceptions import CanNotTakePositionException
-
 
 class FigureOnBoard(object):
     """ The base class for the description of the figures Logic
@@ -17,21 +15,17 @@ class FigureOnBoard(object):
 
     display_char = None
 
-    def __init__(self, board=None, pos_x=None, pos_y=None):
+    def __init__(self, board, pos_x, pos_y):
         self._cells_to_attack = []
         self.board = board
         self.pos_x, self.pos_y = pos_x, pos_y
-        self._take_position()
 
-    def _take_position(self):
-        if not self._can_take_position():
-            raise CanNotTakePositionException
+    def can_take_position(self):
+        """ Detect possibility for taking position: No one on the board is
+            under the impact of this figure
+        :return: True | False
+        """
 
-        self.board.decrease_free_space(self.pos_x, self.pos_y)
-        for coord_x, coord_y in self.cells_to_attack():
-            self.board.decrease_free_space(coord_x, coord_y)
-
-    def _can_take_position(self):
         figure_positions = {(f.pos_x, f.pos_y) for f in self.board.figures}
         attack_cells = set(self.cells_to_attack())
         return not bool(figure_positions.intersection(attack_cells))

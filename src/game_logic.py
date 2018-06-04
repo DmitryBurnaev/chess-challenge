@@ -6,8 +6,7 @@ It uses for run-mode (basic usages) and test-mode (check of the game logic)
 import copy
 import gc
 
-from src.exceptions import CanNotTakePositionException, \
-    GameArgumentsValidationError
+from src.exceptions import GameArgumentsValidationError
 from src.figures import King, Rook, Queen, Bishop, Knight
 
 
@@ -26,7 +25,7 @@ class Game(object):
 
     def __init__(self, dim_x, dim_y, figures_numbers):
         self.serialized_boards = []
-        self._result_boards_dict = {}
+        self._result_boards_dict = {}  # uses for tmp storing uniq boards comb.
         self.dimension_x = dim_x
         self.dimension_y = dim_y
         self.possible_figures = []
@@ -56,15 +55,17 @@ class Game(object):
     def _create_combinations(self, board):
         """ Recursive logic for calculate combinations """
 
-        next_figure = board.next_figure()
+        next_figure_class = board.next_figure()
 
-        for cell in board.free_cells:
-            new_board = copy.deepcopy(board)
-            try:
-                new_board.place_figure(next_figure, cell[0], cell[1])
-            except CanNotTakePositionException:
-                del new_board
+        for coord_x, coord_y in board.free_cells:
+            # step over free cells for trying to place figure on this board
+            new_figure = next_figure_class(board, coord_x, coord_y)
+            if not new_figure.can_take_position():
+                del new_figure
                 continue
+
+            new_board = copy.deepcopy(board)
+            new_board.place_figure(next_figure_class, coord_x, coord_y)
 
             if new_board.possible_figures:
                 self._create_combinations(new_board)
@@ -167,17 +168,28 @@ class Board(object):
             pass
 
     def next_figure(self):
-        """ Get next of possible figures for this board"""
+        """
+        Get next of possible figure's class for this board
+        :return: subclass of <FigureOnBoard>
+        """
 
         if not self.possible_figures:
             return None
         return self.possible_figures.pop(0)
 
-    def place_figure(self, figure_type, pos_x, pos_y):
-        """ Take position for specified figure"""
-
-        figure = figure_type(board=self, pos_x=pos_x, pos_y=pos_y)
+    def place_figure(self, figure_class, pos_x, pos_y):
+        """
+        Take position for specified figure
+        :param figure_class: class for generate instance
+                            (subclass for FigureOnBoard)
+        :param pos_x: coordinate X for figure on this board
+        :param pos_y: coordinate Y for figure on this board
+        """
+        figure = figure_class(board=self, pos_x=pos_x, pos_y=pos_y)
         self.figures.append(figure)
+        self.decrease_free_space(figure.pos_x, figure.pos_y)
+        for coord_x, coord_y in figure.cells_to_attack():
+            self.decrease_free_space(coord_x, coord_y)
 
     def serialize(self):
         """ Represent all important data for storing to result collection"""
