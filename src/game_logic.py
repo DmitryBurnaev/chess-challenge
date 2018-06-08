@@ -9,7 +9,7 @@ import os
 
 from src.exceptions import GameArgumentsValidationError
 from src.figures import King, Rook, Queen, Bishop, Knight
-
+from src.logging_config import get_logger, get_log_file_handler
 
 # Sorted by the number of attacked cells
 ALIASES_FIGURES_MAP = (
@@ -23,8 +23,9 @@ ALIASES_FIGURES_MAP = (
 
 class Game(object):
     """ Main class for realize creation of possible chess combinations """
+    logger = get_logger()
 
-    def __init__(self, dim_x, dim_y, figures_numbers):
+    def __init__(self, dim_x, dim_y, figures_numbers, result_to_file=False):
         self.serialized_boards = []
         self._result_boards_dict = {}  # uses for tmp storing uniq boards comb.
         self.dimension_x = dim_x
@@ -37,6 +38,10 @@ class Game(object):
             # initial list of possible figure's types.Such as: [KING, QUEEN,..]
             figures_count = figures_numbers.get(alias, 0)
             self.possible_figures.extend([figure_type] * figures_count)
+
+        if result_to_file:
+            file_handler = get_log_file_handler()
+            self.logger.addHandler(file_handler)
 
     def _validate_params(self):
         """ Helps to check incoming params for generation of combinations """
@@ -112,27 +117,31 @@ class Game(object):
         """ Display result of work this application.
             This method prints all generated combinations.
         """
-        print('Result'.center(40, '-'))
+        self.logger.info('Result'.center(40, '-'))
         if self.serialized_boards:
-            print('Found {} combinations:'.format(len(self.serialized_boards)))
+            self.logger.info(
+                'Found {} combinations:'.format(len(self.serialized_boards))
+            )
             for combinations in self.serialized_boards:
-                print(' | '.join(map(str, combinations)))
+                self.logger.info(' | '.join(map(str, combinations)))
                 self._render_graphic_board(combinations)
-                print('-'.center(20, '-'))
+                self.logger.info('-'.center(20, '-'))
         else:
-            print('Sorry, no matches were found for your query.')
-        print('-'.center(40, '-'))
+            self.logger.info('Sorry, no matches were found for your query.')
+        self.logger.info('-'.center(40, '-'))
 
     def render_initial_data(self):
         """ Display data received to generate combinations """
 
-        print('Initial configuration'.center(40, '-'))
-        print('Boards dimensions: {} x {}'.format(self.dimension_x,
+        self.logger.info('Initial configuration'.center(40, '-'))
+        self.logger.info('Boards dimensions: {} x {}'.format(self.dimension_x,
                                                   self.dimension_y))
-        print('Figures set:')
+        self.logger.info('Figures set:')
         for alias, numbers in self.figures_numbers.items():
             if numbers > 0:
-                print('{:^12}:{:^5}'.format(alias.capitalize(), numbers))
+                self.logger.info(
+                    '{:^12}:{:^5}'.format(alias.capitalize(), numbers)
+                )
 
     def _render_graphic_board(self, combinations):
         """ Render ASCI board with generated combination """
@@ -141,7 +150,7 @@ class Game(object):
         res = '    '
         for coord_x in range(self.dimension_x):
             res += '{} '.format(coord_x+1)
-        print(res)
+        self.logger.info(res)
         for coord_y in range(self.dimension_y):
             res = '{} | '.format(coord_y+1)
             for coord_x in range(self.dimension_x):
@@ -149,7 +158,7 @@ class Game(object):
                     res += cells[(coord_x, coord_y)]['display_char'] + ' '
                 else:
                     res += '- '
-            print(res)
+            self.logger.info(res)
 
     def run(self):
         """ Run generation of all possible combinations and display them to

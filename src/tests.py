@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 import sys
 import unittest
@@ -278,11 +279,31 @@ def capture(command, *args, **kwargs):
         sys.stdout = out
 
 
+class CapturableHandler(logging.StreamHandler):
+
+    @property
+    def stream(self):
+        return sys.stdout
+
+    @stream.setter
+    def stream(self, value):
+        pass
+
+
 class RunModeTestCase(unittest.TestCase):
     """ Detect and recheck sys output after rendering uses messages """
 
+    @classmethod
+    def setUpClass(cls):
+        cls.logger = logging.getLogger()
+        cls.logger.setLevel(logging.INFO)
+        # stream_handler = logging.StreamHandler(stream=sys.stdout)
+        stream_handler = CapturableHandler(stream=sys.stdout)
+        cls.logger.handlers = [stream_handler]
+
     def test_render_initial_data(self):
         game = Game(4, 3, {'kings': 3, 'rooks': 2})
+        game.logger = self.logger
         with capture(game.render_initial_data) as output:
             msg = 'Boards dimensions: {} x {}'.format(
                 game.dimension_x, game.dimension_y
@@ -293,6 +314,7 @@ class RunModeTestCase(unittest.TestCase):
 
     def test_run_game_and_render_results(self):
         game = Game(3, 2, {'kings': 1, 'rooks': 1})
+        game.logger = self.logger
         with capture(game.run) as output:
             number_of_results = len(game.serialized_boards)
             msg = 'Found {} combinations:'.format(number_of_results)

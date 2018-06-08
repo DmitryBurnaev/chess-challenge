@@ -21,9 +21,11 @@ $ python3 -m src.run --help
 import argparse
 
 from src.game_logic import Game
-
+from src.logging_config import get_logger
 
 if __name__ == '__main__':
+    logger = get_logger(__name__)
+
     p = argparse.ArgumentParser()
     p.add_argument('dimension_x', metavar='Dimension X', type=int,
                    choices=range(1, 9),
@@ -37,6 +39,9 @@ if __name__ == '__main__':
     p.add_argument('--rooks', type=int, default=0, help='Number of Rooks')
     p.add_argument('--bishops', type=int, default=0, help='Number of Bishops')
     p.add_argument('--knights', type=int, default=0, help='Number of Knights')
+
+    p.add_argument('--file', default=False, action='store_true',
+                   help='To write result to file')
     args = p.parse_args()
 
     total_figure_numbers = sum(
@@ -44,14 +49,15 @@ if __name__ == '__main__':
     )
 
     if total_figure_numbers == 0:
-        print('Total numbers of figures must be greater than 0.\n'
-              'Please, specify other arguments for needed combinations.')
+        logger.critical('Total numbers of figures must be greater than 0.\n'
+                        'Please, specify other arguments for needed '
+                        'combinations.')
         exit(1)
     else:
         if total_figure_numbers >= (args.dimension_x * args.dimension_y):
-            print('The number of figures is greater than the dimension of the '
-                  'board. \nPlease, specify other arguments for needed '
-                  'combinations.')
+            logger.critical('The number of figures is greater than the '
+                            'dimension of the board. \nPlease, specify other '
+                            'arguments for needed combinations.')
             exit(1)
 
     figures_set = {
@@ -61,5 +67,6 @@ if __name__ == '__main__':
         'bishops': args.bishops,
         'knights': args.knights
     }
-    game = Game(args.dimension_x, args.dimension_y, figures_set)
+    game = Game(args.dimension_x, args.dimension_y, figures_set,
+                result_to_file=args.file)
     game.run()
