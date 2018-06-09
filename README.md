@@ -1,5 +1,10 @@
 **Python application for creating chess combinations.** 
 
+Description for the task
+https://drive.google.com/file/d/10i2IY1QzCT5iCGIHG6fgOg1i53a5vv0b/view?usp=sharing
+
+
+
 _How to install_
 ```bash
 git clone git@github.com:DmitryBurnaev/chess-challenge.git <path_to_project>
@@ -26,10 +31,11 @@ python3 -m src.run 3 3 --kings 1 --rooks 2
 
 ```
 
-To generate a combination for 1 king and 2 rooks on a 3 x 3 board:
+Below is an example of creating a combination for 1 king and 2 rooks on a 3 x 3 board.  
+All results will be written to the file <path_to_project>/results.log
 
 ```bash
-$ python3 -m src.run 3 3 --kings 1 --rooks 2
+$ python3 -m src.run 3 3 --kings 1 --rooks 2 --file
 
 
 ---------Initial configuration----------
