@@ -1,5 +1,5 @@
 """ Module for implementation the game logic.
-It uses for run-mode (basic usages) and test-mode (check of the game logic)
+It is using for run-mode (basic usages) and test-mode (check of the game logic)
 
 """
 import copy
@@ -9,7 +9,7 @@ import os
 
 from src.exceptions import GameArgumentsValidationError
 from src.figures import King, Rook, Queen, Bishop, Knight
-from src.logging_config import get_logger, get_log_file_handler
+from src.logger import get_logger, get_log_file_handler
 
 # Sorted by the number of attacked cells
 ALIASES_FIGURES_MAP = (
@@ -22,7 +22,7 @@ ALIASES_FIGURES_MAP = (
 
 
 class Game(object):
-    """ Main class for realize creation of possible chess combinations """
+    """ The main class for creating possible chess combinations """
     logger = get_logger()
 
     def __init__(self, dim_x, dim_y, figures_numbers, result_to_file=False):
@@ -44,7 +44,7 @@ class Game(object):
             self.logger.addHandler(file_handler)
 
     def _validate_params(self):
-        """ Helps to check incoming params for generation of combinations """
+        """ This method helps to check incoming params for combinations """
 
         dimensions = self.dimension_x * self.dimension_y
         if dimensions <= 0:
@@ -59,7 +59,7 @@ class Game(object):
             )
 
     def _create_combinations(self, board):
-        """ Recursive logic for calculate combinations """
+        """ Recursive logic for calculating combinations """
 
         next_figure_class = board.next_figure()
 
@@ -85,8 +85,8 @@ class Game(object):
         return self._result_boards_dict
 
     def generate_combinations(self):
-        """ Run logic for generate all combinations. All combinations store to
-            self.serialized_boards
+        """ It runs logic to generate all combinations.
+            Founded combinations will store to self.serialized_boards.
         """
         if not self.possible_figures:
             return
@@ -114,9 +114,8 @@ class Game(object):
         self.serialized_boards = self._result_boards_dict.values()
 
     def render_boards(self):
-        """ Display result of work this application.
-            This method prints all generated combinations.
-        """
+        """ Display result of work this application. """
+
         self.logger.info('Result'.center(40, '-'))
         if self.serialized_boards:
             self.logger.info(
@@ -175,13 +174,14 @@ class Board(object):
     """
 
     def __init__(self, game):
-        self.game = game
+        self.dimension_x = game.dimension_x
+        self.dimension_y = game.dimension_y
+        self.possible_figures = game.possible_figures
         self.figures = []
         self.free_cells = []
-        self.possible_figures = game.possible_figures
 
-        for coord_x in range(self.game.dimension_x):
-            for coord_y in range(self.game.dimension_y):
+        for coord_x in range(self.dimension_x):
+            for coord_y in range(self.dimension_y):
                 self.free_cells.append([coord_x, coord_y])
 
     def __hash__(self):
@@ -191,7 +191,7 @@ class Board(object):
         return hash(str_repr)
 
     def decrease_free_space(self, pos_x, pos_y):
-        """ Remove free cells after placing a new figure to the board """
+        """ Removing free cells after placing a new figure to the board """
 
         try:
             self.free_cells.remove([pos_x, pos_y])
@@ -199,8 +199,8 @@ class Board(object):
             pass
 
     def next_figure(self):
-        """
-        Get next of possible figure's class for this board
+        """ Getting next of possible figure's class for this board
+
         :return: subclass of <FigureOnBoard>
         """
 
@@ -209,10 +209,10 @@ class Board(object):
         return self.possible_figures.pop(0)
 
     def place_figure(self, figure_class, pos_x, pos_y):
-        """
-        Take position for specified figure
+        """ Take position for specified figure
+
         :param figure_class: class for generate instance
-                            (subclass for FigureOnBoard)
+                             (subclass for FigureOnBoard)
         :param pos_x: coordinate X for figure on this board
         :param pos_y: coordinate Y for figure on this board
         """

@@ -1,13 +1,13 @@
 """
-This module provides figures logic and data descriptions
-You can extend game logic by adding a new figure's type
-(Inherit from FigureOnBoard)
+This module provides figures logic and data descriptions.
+You can extend the game logic by adding a new figure's type
+(inherited from the class "FigureOnBoard")
 """
 
 
 class FigureOnBoard(object):
     """ The base class for the description of the figures Logic
-        using object's attributes:
+        used object's attributes:
             display_char - symbol for display on ASCI board
             board - current board
             pos_x, pos_y - current position on the board
@@ -59,8 +59,8 @@ class FigureOnBoard(object):
         raise NotImplementedError
 
     def serialize(self):
-        """ Represent <FigureOnBoard> instance for storing important data in
-            combination results
+        """ Representing <FigureOnBoard> instance for storing important data
+            to finally results
 
         :return: like dict-type object
         """
@@ -120,10 +120,10 @@ class Rook(FigureOnBoard):
     def _get_cells_to_attack(self):
         attack_cells = []
         # horizontal attack
-        for coord_x in range(0, self.board.game.dimension_x):
+        for coord_x in range(0, self.board.dimension_x):
             attack_cells.append((coord_x, self.pos_y))
         # vertical attack
-        for coord_y in range(0, self.board.game.dimension_y):
+        for coord_y in range(0, self.board.dimension_y):
             attack_cells.append((self.pos_x, coord_y))
 
         return attack_cells
@@ -143,22 +143,22 @@ class Queen(FigureOnBoard):
         attack_cells = []
         board = self.board
         # horizontal attack
-        for coord_x in range(0, board.game.dimension_x):
+        for coord_x in range(0, board.dimension_x):
             attack_cells.append((coord_x, self.pos_y))
         # vertical attack
-        for coord_y in range(0, board.game.dimension_y):
+        for coord_y in range(0, board.dimension_y):
             attack_cells.append((self.pos_x, coord_y))
 
         # right and up
         coord_x, coord_y = self.pos_x, self.pos_y
-        while coord_x < board.game.dimension_x and coord_y < board.game.dimension_y:
+        while coord_x < board.dimension_x and coord_y < board.dimension_y:
             attack_cells.append((coord_x, coord_y))
             coord_x += 1
             coord_y += 1
 
         # left and up
         coord_x, coord_y = self.pos_x, self.pos_y
-        while coord_x >= 0 and coord_y < board.game.dimension_y:
+        while coord_x >= 0 and coord_y < board.dimension_y:
             attack_cells.append((coord_x, coord_y))
             coord_x -= 1
             coord_y += 1
@@ -172,7 +172,7 @@ class Queen(FigureOnBoard):
 
         # right and down
         coord_x, coord_y = self.pos_x, self.pos_y
-        while coord_x < board.game.dimension_x and coord_y >= 0:
+        while coord_x < board.dimension_x and coord_y >= 0:
             attack_cells.append((coord_x, coord_y))
             coord_x += 1
             coord_y -= 1
@@ -197,14 +197,14 @@ class Bishop(FigureOnBoard):
 
         # right and up
         coord_x, coord_y = self.pos_x, self.pos_y
-        while coord_x < board.game.dimension_x and coord_y < board.game.dimension_y:
+        while coord_x < board.dimension_x and coord_y < board.dimension_y:
             attack_cells.append((coord_x, coord_y))
             coord_x += 1
             coord_y += 1
 
         # left and up
         coord_x, coord_y = self.pos_x, self.pos_y
-        while coord_x >= 0 and coord_y < board.game.dimension_y:
+        while coord_x >= 0 and coord_y < board.dimension_y:
             attack_cells.append((coord_x, coord_y))
             coord_x -= 1
             coord_y += 1
@@ -218,7 +218,7 @@ class Bishop(FigureOnBoard):
 
         # right and down
         coord_x, coord_y = self.pos_x, self.pos_y
-        while coord_x < board.game.dimension_x and coord_y >= 0:
+        while coord_x < board.dimension_x and coord_y >= 0:
             attack_cells.append((coord_x, coord_y))
             coord_x += 1
             coord_y -= 1

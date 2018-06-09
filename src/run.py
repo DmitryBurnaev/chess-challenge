@@ -9,6 +9,7 @@ keyword arguments:
     --rooks: Number of Rooks
     --bishops: Number of Bishops
     --knights: Number of Knights
+    --file: storing all result to <project_dir>/results.log file
 
 Example:
     python3 src.run 3 4 --kings 3 --bishops 2
@@ -21,7 +22,7 @@ $ python3 -m src.run --help
 import argparse
 
 from src.game_logic import Game
-from src.logging_config import get_logger
+from src.logger import get_logger
 
 if __name__ == '__main__':
     logger = get_logger(__name__)

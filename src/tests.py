@@ -40,7 +40,7 @@ class GameInitialTestCase(unittest.TestCase):
 
 
 class FigureAttackTestCase(unittest.TestCase):
-    """ Check logic for detecting attack cells for various figures """
+    """ Checking logic of detecting attack cells for various figures """
 
     @classmethod
     def setUpClass(cls):
@@ -123,7 +123,7 @@ class FigureAttackTestCase(unittest.TestCase):
 
 
 class FillBoardTestCase(unittest.TestCase):
-    """ Check base game logic (for main usages) """
+    """ Checking base game logic (for main usages) """
 
     @classmethod
     def setUpClass(cls):
@@ -279,7 +279,9 @@ def capture(command, *args, **kwargs):
         sys.stdout = out
 
 
-class CapturableHandler(logging.StreamHandler):
+class CaptureLoggingHandler(logging.StreamHandler):
+    """ This class helps to capture stdout stream for testing output data
+    """
 
     @property
     def stream(self):
@@ -291,14 +293,14 @@ class CapturableHandler(logging.StreamHandler):
 
 
 class RunModeTestCase(unittest.TestCase):
-    """ Detect and recheck sys output after rendering uses messages """
+    """ Detect and re-test sys output after rendering all data """
 
     @classmethod
     def setUpClass(cls):
         cls.logger = logging.getLogger()
         cls.logger.setLevel(logging.INFO)
         # stream_handler = logging.StreamHandler(stream=sys.stdout)
-        stream_handler = CapturableHandler(stream=sys.stdout)
+        stream_handler = CaptureLoggingHandler(stream=sys.stdout)
         cls.logger.handlers = [stream_handler]
 
     def test_render_initial_data(self):

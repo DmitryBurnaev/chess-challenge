@@ -24,6 +24,8 @@ LOGGING_CONFIG = {
             'level': 'INFO',
             'filename': os.path.join(LOG_DIR, 'results.log'),
             'mode': 'w',
+            'delay': True  # if True, then file opening is deferred until the
+                           # first call to emit().
         }
     },
     'loggers': {
@@ -39,7 +41,6 @@ LOGGING_CONFIG = {
 
 def get_log_file_handler():
     """Shortcut for getting file handler for our project """
-
     file_config = LOGGING_CONFIG['handlers']['file']
     f_name = file_config['filename']
     f_mode = file_config['mode']
@@ -52,10 +53,8 @@ def get_logger(name=None):
     """ Getting configured logger
     :param name: current module (if necessary)
     """
-
     logging.config.dictConfig(LOGGING_CONFIG)
     logger_name = name or 'game_logic'
-    print(logger_name)
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
     return logger
